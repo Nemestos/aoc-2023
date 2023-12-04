@@ -185,7 +185,5 @@ export default class Day02 extends DayResolver {
       .filter((arr) => arr.length == 2)
       .flatMap((arr) => arr.reduce((prev, curr) => prev * curr))
       .reduce((prev, curr) => prev + curr);
-
-    return 0;
   }
 }
