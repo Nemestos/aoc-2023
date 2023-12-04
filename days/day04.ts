@@ -32,10 +32,29 @@ export default class Day03 extends DayResolver {
       return game;
     });
   }
-  calculateCardPoints(card: Card) {
-    const numberKeeped = card.playedNumbers.filter((number) =>
-      card.winningNumbers.includes(number),
+  getNumbersKeeped(card: Card) {
+    return (
+      card?.playedNumbers.filter((number) =>
+        card.winningNumbers.includes(number),
+      ) ?? []
     );
+  }
+  getCardsCopy(baseCards: Card[], processedCards: Card[]) {
+    let cardsCopy: Card[] = [];
+    processedCards.forEach((card) => {
+      const numbersKeeped = this.getNumbersKeeped(card);
+      if (numbersKeeped.length > 0) {
+        const cardsToAdd = baseCards.slice(
+          card.id,
+          card.id + numbersKeeped.length,
+        );
+        cardsCopy = [...cardsCopy, ...cardsToAdd];
+      }
+    });
+    return cardsCopy;
+  }
+  calculateCardPoints(card: Card) {
+    const numberKeeped = this.getNumbersKeeped(card);
     return numberKeeped.length > 0 ? 2 ** (numberKeeped.length - 1) : 0;
   }
 
@@ -46,9 +65,24 @@ export default class Day03 extends DayResolver {
       .map((card) => this.calculateCardPoints(card))
       .reduce((prev, curr) => prev + curr);
   }
+
   solveSecondStar(): number {
     const input = this.getInput();
+    const cards = this.parseCards(input);
+    const cardsInstance = new Map<number, number>();
+    cards.forEach((card) => {
+      cardsInstance.set(card.id, 1);
+    });
+    cards.forEach((card) => {
+      const numbersKeeped = this.getNumbersKeeped(card);
+      for (let i = card.id + 1; i < card.id + numbersKeeped.length + 1; i++) {
+        cardsInstance.set(
+          i,
+          cardsInstance.get(i)! + cardsInstance.get(card.id)!,
+        );
+      }
+    });
 
-    return 0;
+    return [...cardsInstance.values()].reduce((prev, curr) => prev + curr);
   }
 }
