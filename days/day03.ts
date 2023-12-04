@@ -37,37 +37,72 @@ export default class Day02 extends DayResolver {
     }
     return grid;
   }
-  adjacentToSymbol(grid: Grid, i: number, j: number) {
+  adjacentToSymbol(
+    grid: Grid,
+    i: number,
+    j: number,
+    customSymbol: string | null = null,
+  ) {
     const rowCount = grid.length;
     const columnCount = grid[0].length;
 
-    const left = j > 0 && grid[i][j - 1].type == CellType.SYMBOL;
+    const left =
+      j > 0 &&
+      grid[i][j - 1].type == CellType.SYMBOL &&
+      (!customSymbol || grid[i][j - 1].value === customSymbol);
     const leftTopDiag =
-      i > 0 && j > 0 && grid[i - 1][j - 1].type == CellType.SYMBOL;
-    const top = i > 0 && grid[i - 1][j].type == CellType.SYMBOL;
+      i > 0 &&
+      j > 0 &&
+      grid[i - 1][j - 1].type == CellType.SYMBOL &&
+      (!customSymbol || grid[i - 1][j - 1].value === customSymbol);
+    const top =
+      i > 0 &&
+      grid[i - 1][j].type == CellType.SYMBOL &&
+      (!customSymbol || grid[i - 1][j].value === customSymbol);
     const rightTopDiag =
       i > 0 &&
       j < columnCount - 1 &&
-      grid[i - 1][j + 1].type == CellType.SYMBOL;
-    const right = j < columnCount - 1 && grid[i][j + 1].type == CellType.SYMBOL;
+      grid[i - 1][j + 1].type == CellType.SYMBOL &&
+      (!customSymbol || grid[i - 1][j + 1].value === customSymbol);
+
+    const right =
+      j < columnCount - 1 &&
+      grid[i][j + 1].type == CellType.SYMBOL &&
+      (!customSymbol || grid[i][j + 1].value === customSymbol);
     const rightBottomDiag =
       i < rowCount - 1 &&
       j < columnCount - 1 &&
-      grid[i + 1][j + 1].type == CellType.SYMBOL;
-    const bottom = i < rowCount - 1 && grid[i + 1][j].type == CellType.SYMBOL;
+      grid[i + 1][j + 1].type == CellType.SYMBOL &&
+      (!customSymbol || grid[i + 1][j + 1].value === customSymbol);
+    const bottom =
+      i < rowCount - 1 &&
+      grid[i + 1][j].type == CellType.SYMBOL &&
+      (!customSymbol || grid[i + 1][j].value === customSymbol);
     const leftBottomDiag =
-      i < rowCount - 1 && j > 0 && grid[i + 1][j - 1].type == CellType.SYMBOL;
+      i < rowCount - 1 &&
+      j > 0 &&
+      grid[i + 1][j - 1].type == CellType.SYMBOL &&
+      (!customSymbol || grid[i + 1][j - 1].value === customSymbol);
 
-    return (
-      left ||
-      leftTopDiag ||
-      top ||
-      rightTopDiag ||
-      right ||
-      rightBottomDiag ||
-      bottom ||
-      leftBottomDiag
-    );
+    if (left) {
+      return [i, j - 1];
+    } else if (leftTopDiag) {
+      return [i - 1, j - 1];
+    } else if (top) {
+      return [i - 1, j];
+    } else if (rightTopDiag) {
+      return [i - 1, j + 1];
+    } else if (right) {
+      return [i, j + 1];
+    } else if (rightBottomDiag) {
+      return [i + 1, j + 1];
+    } else if (bottom) {
+      return [i + 1, j];
+    } else if (leftBottomDiag) {
+      return [i + 1, j - 1];
+    } else {
+      return false;
+    }
   }
   solveFirstStar() {
     const input = this.getInput();
@@ -79,7 +114,7 @@ export default class Day02 extends DayResolver {
       while (j < line.length) {
         const cell = grid[i][j];
         if (cell.type === CellType.DIGIT) {
-          const validDigits = [];
+          const validDigits: boolean[] = [];
           let capturedNumber = "";
           let newColumnIndex = j;
           while (
@@ -87,7 +122,8 @@ export default class Day02 extends DayResolver {
             line[newColumnIndex].type == CellType.DIGIT
           ) {
             capturedNumber += line[newColumnIndex].value;
-            validDigits.push(this.adjacentToSymbol(grid, i, newColumnIndex));
+            const validity = this.adjacentToSymbol(grid, i, newColumnIndex);
+            validDigits.push(validity != false);
             newColumnIndex += 1;
           }
           j = newColumnIndex;
@@ -103,6 +139,53 @@ export default class Day02 extends DayResolver {
   }
   solveSecondStar(): number {
     const input = this.getInput();
+    const grid = this.tokenizeGrid(input);
+    const gearsMap = new Map<string, number[]>();
+
+    for (let i = 0; i < grid.length; i++) {
+      let j = 0;
+      const line = grid[i];
+      while (j < line.length) {
+        const cell = grid[i][j];
+        if (cell.type === CellType.DIGIT) {
+          const gearsSymbols = [];
+          let capturedNumber = "";
+          let newColumnIndex = j;
+          while (
+            newColumnIndex < line.length &&
+            line[newColumnIndex].type == CellType.DIGIT
+          ) {
+            capturedNumber += line[newColumnIndex].value;
+            const validity = this.adjacentToSymbol(
+              grid,
+              i,
+              newColumnIndex,
+              "*",
+            );
+            if (validity !== false) {
+              gearsSymbols.push(validity);
+            }
+            newColumnIndex += 1;
+          }
+          j = newColumnIndex;
+
+          if (gearsSymbols.length > 0) {
+            const symbol = gearsSymbols[0];
+            const serializedSymbol = symbol.join(",");
+
+            const lastArray = gearsMap.get(serializedSymbol) ?? [];
+            gearsMap.set(serializedSymbol, [...lastArray, +capturedNumber]);
+          }
+        } else {
+          j += 1;
+        }
+      }
+    }
+    return [...gearsMap.values()]
+      .filter((arr) => arr.length == 2)
+      .flatMap((arr) => arr.reduce((prev, curr) => prev * curr))
+      .reduce((prev, curr) => prev + curr);
+
     return 0;
   }
 }
