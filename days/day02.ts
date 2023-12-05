@@ -49,7 +49,7 @@ export default class Day02 extends DayResolver {
     });
   }
 
-  solveFirstStar() {
+  async solveFirstStar() {
     const input = this.getInput();
     const parsedGames: Game[] = this.parseGames(input);
     const correctGames = parsedGames.filter((game) =>
@@ -59,7 +59,7 @@ export default class Day02 extends DayResolver {
       .map((game) => game.id)
       .reduce((prev, curr) => prev + curr);
   }
-  solveSecondStar(): number {
+  async solveSecondStar() {
     const input = this.getInput();
     const parsedGames: Game[] = this.parseGames(input);
 

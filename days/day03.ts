@@ -12,7 +12,7 @@ interface Cell {
 type Grid = Cell[][];
 
 export default class Day02 extends DayResolver {
-  constructor(input: string[]) {
+  constructor(input: string) {
     super(input);
   }
 
@@ -104,7 +104,7 @@ export default class Day02 extends DayResolver {
       return false;
     }
   }
-  solveFirstStar() {
+  async solveFirstStar() {
     const input = this.getInput();
     const grid = this.tokenizeGrid(input);
     let validNumbersSum = 0;
@@ -137,7 +137,7 @@ export default class Day02 extends DayResolver {
     }
     return validNumbersSum;
   }
-  solveSecondStar(): number {
+  async solveSecondStar() {
     const input = this.getInput();
     const grid = this.tokenizeGrid(input);
     const gearsMap = new Map<string, number[]>();

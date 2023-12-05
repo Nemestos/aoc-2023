@@ -2,6 +2,7 @@ import path from "path";
 import { AdventDay, readDay } from "./utils";
 import * as fs from "fs";
 import { DayResolver } from "./day.base";
+import rawlist from "@inquirer/rawlist";
 
 const createDayResolver = (
   DayClass: new (input: string, sep: string) => DayResolver,
@@ -12,7 +13,7 @@ const createDayResolver = (
 };
 const daysDirectory = path.join(__dirname, "days");
 
-fs.readdir(daysDirectory, (err, files) => {
+fs.readdir(daysDirectory, async (err, files) => {
   if (err) {
     console.error("Erreur de lecture du répertoire:", err);
     return;
@@ -20,30 +21,28 @@ fs.readdir(daysDirectory, (err, files) => {
   const dayFiles = files.filter(
     (file) => file.startsWith("day") && file.endsWith(".ts"),
   );
-  dayFiles.forEach((dayFile) => {
-    const dayPath = path.join(daysDirectory, dayFile);
-    import(dayPath)
-      .then((module) => {
-        if (module && module.default) {
-          const DayClass = module.default as new (
-            input: string,
-            sep: string,
-          ) => DayResolver;
-          const dayInput = readDay(dayFile.replace(".ts", "") as AdventDay);
 
-          const resolver = createDayResolver(DayClass, dayInput, "\n");
-          console.log(`Résolution pour ${dayFile}:`);
-          const firstStar = resolver.solveFirstStar();
-          const secondStar = resolver.solveSecondStar();
-          console.log(firstStar);
-          console.log(secondStar);
-        }
-      })
-      .catch((err) => {
-        console.error(
-          `Erreur lors de l'importation du fichier ${dayFile}:`,
-          err,
-        );
-      });
+  const answer = await rawlist({
+    message: "Select a day",
+    choices: dayFiles.map((dayFile, index) => {
+      return { name: dayFile, value: index };
+    }),
   });
+  const dayFile = dayFiles[answer];
+  const dayPath = path.join(daysDirectory, dayFile);
+  const module = await import(dayPath);
+  if (module && module.default) {
+    const DayClass = module.default as new (
+      input: string,
+      sep: string,
+    ) => DayResolver;
+    const dayInput = readDay(dayFile.replace(".ts", "") as AdventDay);
+
+    const resolver = createDayResolver(DayClass, dayInput, "\n");
+    console.log(`Résolution pour ${dayFile}:`);
+    const firstStar = await resolver.solveFirstStar();
+    const secondStar = await resolver.solveSecondStar();
+    console.log(firstStar);
+    console.log(secondStar);
+  }
 });

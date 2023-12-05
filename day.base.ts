@@ -6,8 +6,8 @@ export abstract class DayResolver {
     this.input = input.split(sep);
   }
 
-  abstract solveFirstStar(): number;
-  abstract solveSecondStar(): number;
+  abstract solveFirstStar(): Promise<number>;
+  abstract solveSecondStar(): Promise<number>;
 
   getInput(): string[] {
     return this.input;

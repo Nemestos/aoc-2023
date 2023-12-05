@@ -58,7 +58,7 @@ export default class Day04 extends DayResolver {
     return numberKeeped.length > 0 ? 2 ** (numberKeeped.length - 1) : 0;
   }
 
-  solveFirstStar() {
+  async solveFirstStar() {
     const input = this.getInput();
     const cards = this.parseCards(input);
     return cards
@@ -66,7 +66,7 @@ export default class Day04 extends DayResolver {
       .reduce((prev, curr) => prev + curr);
   }
 
-  solveSecondStar(): number {
+  async solveSecondStar() {
     const input = this.getInput();
     const cards = this.parseCards(input);
     const cardsInstance = new Map<number, number>();

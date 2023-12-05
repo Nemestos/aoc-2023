@@ -5,7 +5,7 @@ export default class Day01 extends DayResolver {
     super(input, "\n");
   }
 
-  solveFirstStar() {
+  async solveFirstStar() {
     const input = this.getInput();
 
     const numbers = input.map((line) => {
@@ -14,7 +14,7 @@ export default class Day01 extends DayResolver {
     });
     return numbers.reduce((prev, curr) => prev + curr);
   }
-  solveSecondStar(): number {
+  async solveSecondStar() {
     const NUMBERS_STRING = [
       "one",
       "two",
