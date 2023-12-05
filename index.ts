@@ -4,10 +4,11 @@ import * as fs from "fs";
 import { DayResolver } from "./day.base";
 
 const createDayResolver = (
-  DayClass: new (input: string[]) => DayResolver,
-  input: string[],
+  DayClass: new (input: string, sep: string) => DayResolver,
+  input: string,
+  sep: string,
 ): DayResolver => {
-  return new DayClass(input);
+  return new DayClass(input, sep);
 };
 const daysDirectory = path.join(__dirname, "days");
 
@@ -25,11 +26,12 @@ fs.readdir(daysDirectory, (err, files) => {
       .then((module) => {
         if (module && module.default) {
           const DayClass = module.default as new (
-            input: string[],
+            input: string,
+            sep: string,
           ) => DayResolver;
           const dayInput = readDay(dayFile.replace(".ts", "") as AdventDay);
 
-          const resolver = createDayResolver(DayClass, dayInput);
+          const resolver = createDayResolver(DayClass, dayInput, "\n");
           console.log(`Résolution pour ${dayFile}:`);
           const firstStar = resolver.solveFirstStar();
           const secondStar = resolver.solveSecondStar();

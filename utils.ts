@@ -28,6 +28,5 @@ export type AdventDay =
   | "day25";
 
 export const readDay = (day: AdventDay) => {
-  const data = fs.readFileSync(`./inputs/${day}.txt`, "utf-8");
-  return data.split("\n");
+  return fs.readFileSync(`./inputs/${day}.txt`, "utf-8");
 };

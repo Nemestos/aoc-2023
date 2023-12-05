@@ -1,8 +1,8 @@
 import { DayResolver } from "../day.base";
 
 export default class Day01 extends DayResolver {
-  constructor(input: string[]) {
-    super(input);
+  constructor(input: string) {
+    super(input, "\n");
   }
 
   solveFirstStar() {

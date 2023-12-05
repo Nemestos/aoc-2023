@@ -6,9 +6,9 @@ interface Card {
   playedNumbers: number[];
 }
 
-export default class Day03 extends DayResolver {
-  constructor(input: string[]) {
-    super(input);
+export default class Day04 extends DayResolver {
+  constructor(input: string) {
+    super(input, "\n");
   }
 
   private parseCards(lines: string[]): Card[] {

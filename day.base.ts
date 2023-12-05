@@ -1,8 +1,9 @@
 export abstract class DayResolver {
   private input: string[];
-
-  constructor(input: string[]) {
-    this.input = input;
+  private sep: string;
+  constructor(input: string, sep: string = "\n") {
+    this.sep = sep;
+    this.input = input.split(sep);
   }
 
   abstract solveFirstStar(): number;

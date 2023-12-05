@@ -10,8 +10,8 @@ interface Game {
 }
 
 export default class Day02 extends DayResolver {
-  constructor(input: string[]) {
-    super(input);
+  constructor(input: string) {
+    super(input, "\n");
   }
 
   private checkCorrect(colors: Colors) {
