@@ -25,7 +25,24 @@ export default class Day06 extends DayResolver {
 
   async solveSecondStar() {
     const input = this.getInput();
+    let duration = "";
+    let record = "";
 
-    return 0;
+    input.forEach((line) => {
+      const [currentDuration, currentRecord] = line.split(",");
+      duration += currentDuration;
+      record += currentRecord;
+    });
+    const parsedDuration = +duration;
+    const parsedRecord = +record;
+    let count = 0;
+    for (let i = 1; i < parsedDuration - 1; i++) {
+      const distance = i * (parsedDuration - i);
+      if (distance > parsedRecord) {
+        count += 1;
+      }
+    }
+
+    return count;
   }
 }
