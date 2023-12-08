@@ -20,7 +20,15 @@ export default class Day06 extends DayResolver {
   constructor(input: string) {
     super(input, "\n");
   }
-
+  cardPatternsMatch: Record<string, HandType> = {
+    "[5]": HandType.FIVE,
+    "[1,4]": HandType.FOUR,
+    "[2,3]": HandType.FULL_HOUSE,
+    "[1,1,3]": HandType.THREE,
+    "[1,2,2]": HandType.TWO_PAIR,
+    "[1,1,1,2]": HandType.ONE_PAIR,
+    "[1,1,1,1,1]": HandType.HIGH,
+  };
   getSetType(values: string[]): HandType {
     const cardsRepartition = new Map<string, number>();
     values.forEach((value) => {
@@ -29,34 +37,10 @@ export default class Day06 extends DayResolver {
     const differentsCardsValues = JSON.stringify(
       [...cardsRepartition.values()].sort(),
     );
-    const cardPatternsMatch: Record<string, HandType> = {
-      "[5]": HandType.FIVE,
-      "[1,4]": HandType.FOUR,
-      "[2,3]": HandType.FULL_HOUSE,
-      "[1,1,3]": HandType.THREE,
-      "[1,2,2]": HandType.TWO_PAIR,
-      "[1,1,1,2]": HandType.ONE_PAIR,
-      "[1,1,1,1,1]": HandType.HIGH,
-    };
-    return cardPatternsMatch[differentsCardsValues];
+    return this.cardPatternsMatch[differentsCardsValues];
   }
-  firstIsBetterThanSecond(first: Hand, second: Hand) {
+  firstIsBetterThanSecond(first: Hand, second: Hand, rankedCards: string[]) {
     let i = 0;
-    const rankedCards = [
-      "A",
-      "K",
-      "Q",
-      "J",
-      "T",
-      "9",
-      "8",
-      "7",
-      "6",
-      "5",
-      "4",
-      "3",
-      "2",
-    ];
     while (first.values[i] == second.values[i] && i < 5) {
       i += 1;
     }
@@ -79,7 +63,23 @@ export default class Day06 extends DayResolver {
     });
     const rankedHands = hands.sort((prev, curr) => {
       if (prev.type == curr.type) {
-        if (this.firstIsBetterThanSecond(prev, curr)) {
+        if (
+          this.firstIsBetterThanSecond(prev, curr, [
+            "A",
+            "K",
+            "Q",
+            "J",
+            "T",
+            "9",
+            "8",
+            "7",
+            "6",
+            "5",
+            "4",
+            "3",
+            "2",
+          ])
+        ) {
           return -1;
         }
         return 1;
@@ -93,7 +93,55 @@ export default class Day06 extends DayResolver {
 
   async solveSecondStar() {
     const input = this.getInput();
+    const hands: Hand[] = input.map((line) => {
+      const [set, bid] = line.split(" ");
+      const values = set.split("");
 
-    return 0;
+      const possibleTypes: HandType[] = [this.getSetType(values)];
+      values.forEach((value) => {
+        const newCardValues = values.map((lastValue) => {
+          if (lastValue === "J") {
+            return value;
+          }
+          return lastValue;
+        });
+        const type = this.getSetType(newCardValues);
+        possibleTypes.push(type);
+      });
+
+      return {
+        bid: +bid,
+        values,
+        type: Math.max(...possibleTypes),
+      };
+    });
+    const rankedHands = hands.sort((prev, curr) => {
+      if (prev.type == curr.type) {
+        if (
+          this.firstIsBetterThanSecond(prev, curr, [
+            "A",
+            "K",
+            "Q",
+            "T",
+            "9",
+            "8",
+            "7",
+            "6",
+            "5",
+            "4",
+            "3",
+            "2",
+            "J",
+          ])
+        ) {
+          return -1;
+        }
+        return 1;
+      }
+      return prev.type - curr.type;
+    });
+    return rankedHands
+      .map((hand, index) => hand.bid * (index + 1))
+      .reduce((prev, curr) => prev + curr);
   }
 }
