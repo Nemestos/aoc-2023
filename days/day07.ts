@@ -16,7 +16,7 @@ interface Hand {
   bid: number;
 }
 
-export default class Day06 extends DayResolver {
+export default class Day7 extends DayResolver {
   constructor(input: string) {
     super(input, "\n");
   }
