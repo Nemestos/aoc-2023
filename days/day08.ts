@@ -4,7 +4,7 @@ interface NodeParts {
   left: string;
   right: string;
 }
-export default class Day07 extends DayResolver {
+export default class Day08 extends DayResolver {
   constructor(input: string) {
     super(input, "\n");
   }
