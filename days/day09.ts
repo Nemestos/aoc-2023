@@ -40,7 +40,18 @@ export default class Day09 extends DayResolver {
 
   async solveSecondStar() {
     const input = this.getInput();
+    const parsed = input.map((line) =>
+      line
+        .split(" ")
+        .map((value) => +value)
+        .reverse(),
+    );
 
-    return 0;
+    const predictions = parsed.map((line) => {
+      const allLines = this.getLinesUntilZero(line);
+      return this.getNextValue(allLines);
+    });
+
+    return predictions.reduce((prev, curr) => prev + curr);
   }
 }
